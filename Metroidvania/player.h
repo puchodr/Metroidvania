@@ -1,8 +1,6 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "sprite_state.h"
-
 #include "units.h"
 #include "timer.h"
 #include "sprite.h"
@@ -13,6 +11,7 @@
 #include "damage_text.h"
 #include "damageable.h"
 #include "polar_star.h"
+#include "gun_experience_hud.h"
 
 struct Graphics;
 struct Projectile;
@@ -151,6 +150,7 @@ struct Player : public Damageable {
 
 		WalkingAnimation walking_animation_;
 
+		GunExperienceHud gun_experience_hud_;
 		PolarStar polar_star_;
 
 		std::map<SpriteState, boost::shared_ptr<Sprite> > sprites_;

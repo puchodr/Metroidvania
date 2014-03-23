@@ -9,7 +9,9 @@ namespace units {
 
 	typedef int HP;
 	typedef int GunExperience;
+	
 	typedef unsigned int GunLevel;
+	const GunLevel kMaxGunLevel = 3;
 
 	typedef float Game; // Intrinsic units of position.
 	typedef int Pixel;
