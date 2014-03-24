@@ -37,7 +37,8 @@ void Game::eventLoop() {
 	Input input;
 	SDL_Event event;
 
-	player_.reset(new Player(graphics, units::tileToGame(kScreenWidth / 2), units::tileToGame(kScreenHeight / 2)));
+	ParticleTools particle_tools = { front_particle_system_, entity_particle_system_, graphics };
+	player_.reset(new Player(graphics, particle_tools, units::tileToGame(kScreenWidth / 2), units::tileToGame(kScreenHeight / 2)));
 	damage_texts_.addDamageable(player_);
 	bat_.reset(new FirstCaveBat(graphics, units::tileToGame(7), units::tileToGame(kScreenHeight / 2 + 1)));
 	damage_texts_.addDamageable(bat_);
@@ -95,8 +96,7 @@ void Game::eventLoop() {
 
 		// Player Fire
 		if (input.wasKeyPressed(SDLK_x)) {
-			ParticleTools particle_tools = { front_particle_system_, entity_particle_system_, graphics };
-			player_->startFire(particle_tools);
+			player_->startFire();
 		}
 		else if (input.wasKeyReleased(SDLK_x)) {
 			player_->stopFire();
@@ -115,7 +115,7 @@ void Game::eventLoop() {
 			bat_.reset(new FirstCaveBat(graphics, units::tileToGame(7), units::tileToGame(kScreenHeight / 2 + 1)));
 		}
 		if (input.wasKeyPressed(SDLK_2)) {
-			player_.reset(new Player(graphics, units::tileToGame(kScreenWidth / 2), units::tileToGame(kScreenHeight / 2)));
+			player_.reset(new Player(graphics, particle_tools, units::tileToGame(kScreenWidth / 2), units::tileToGame(kScreenHeight / 2)));
 		}
 		/* TODO TESTING REMOVE LATER */
 
@@ -140,7 +140,7 @@ void Game::update(units::MS elapsed_time_ms, Graphics& graphics) {
 	entity_particle_system_.update(elapsed_time_ms);
 
 	ParticleTools particle_tools = { front_particle_system_, entity_particle_system_, graphics };
-	player_->update(elapsed_time_ms, *map_, particle_tools);
+	player_->update(elapsed_time_ms, *map_);
 	if (bat_) {
 		if (!bat_->update(elapsed_time_ms, player_->center_x())) {
 			DeathCloudParticle::createRandomDeathClouds(particle_tools,

@@ -69,6 +69,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="accelerators.cpp" />
     <ClCompile Include="animated_sprite.cpp" />
     <ClCompile Include="backdrop.cpp" />
     <ClCompile Include="config.cpp" />
@@ -84,6 +85,7 @@
     <ClCompile Include="input.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="map.cpp" />
+    <ClCompile Include="map_collidable.cpp" />
     <ClCompile Include="number_sprite.cpp" />
     <ClCompile Include="particle_system.cpp" />
     <ClCompile Include="player.cpp" />
@@ -96,8 +98,10 @@
     <ClCompile Include="timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="accelerators.h" />
     <ClInclude Include="animated_sprite.h" />
     <ClInclude Include="backdrop.h" />
+    <ClInclude Include="collision_rectangle.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="damageable.h" />
     <ClInclude Include="damage_text.h" />
@@ -110,7 +114,9 @@
     <ClInclude Include="head_bump_particle.h" />
     <ClInclude Include="immobile_single_loop_particle.h" />
     <ClInclude Include="input.h" />
+    <ClInclude Include="kinematics.h" />
     <ClInclude Include="map.h" />
+    <ClInclude Include="map_collidable.h" />
     <ClInclude Include="number_sprite.h" />
     <ClInclude Include="particle.h" />
     <ClInclude Include="particle_system.h" />
