@@ -3,7 +3,7 @@
 #include <cmath>
 
 #include "accelerators.h"
-#include "collision_rectangle.h"
+#include "composite_collision_rectangle.h"
 #include "sprite.h"
 #include "game.h"
 #include "animated_sprite.h"
@@ -53,7 +53,7 @@ namespace {
 	const units::Game kCollisionBottomWidth = 10;
 	const units::Game kCollisionTopLeft = (units::tileToGame(1) - kCollisionTopWidth) / 2;
 	const units::Game kCollisionBottomLeft = (units::tileToGame(1) - kCollisionBottomWidth) / 2;
-	const CollisionRectangle kCollisionRectangle(
+	const CompositeCollisionRectangle kCollisionRectangle(
 		Rectangle(kCollisionTopLeft, kCollisionYTop, kCollisionTopWidth, kCollisionYHeight / 2),
 		Rectangle(kCollisionBottomLeft, kCollisionYTop + kCollisionYHeight / 2,
 				  kCollisionBottomWidth, kCollisionYHeight / 2),
@@ -175,6 +175,11 @@ void Player::takeDamage(units::HP damage) {
 	kinematics_y_.velocity = std::min(kinematics_y_.velocity, -kShortJumpSpeed);
 	invincible_timer_.reset();
 }
+
+void Player::collectPickup(const Pickup&) {
+
+}
+
 
 Rectangle Player::damageRectangle() const {
 	return Rectangle(kinematics_x_.position + kCollisionRectangle.boundingBox().left(),
