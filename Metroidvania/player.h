@@ -127,11 +127,11 @@ struct Player : public Damageable,
 		bool spriteIsVisible() const;
 
 		MotionType motionType() const;
-		bool onGround() const { return on_ground_; }
+		bool on_ground() const { return on_ground_; }
 		const bool gun_up() const 
 			{ return motionType() == WALKING && walking_animation_.stride() != STRIDE_MIDDLE; }
 		VerticalFacing vertical_facing() const { 
-			return onGround() && intended_vertical_facing == DOWN ? 
+			return on_ground() && intended_vertical_facing == DOWN ? 
 			HORIZONTAL : intended_vertical_facing; }
 
 		ParticleTools& particle_tools_;
