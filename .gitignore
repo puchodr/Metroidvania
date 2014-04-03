@@ -64,7 +64,8 @@ _ReSharper*/
 # Office Temp Files
 ~$*
 
-# vim Temp Files
+# vim specific files
+.ycm_extra_conf.py
 *~
 
 #NuGet
