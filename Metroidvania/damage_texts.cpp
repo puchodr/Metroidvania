@@ -1,6 +1,6 @@
 #include "damage_texts.h"
 
-#include "damage_text.h"
+#include "floating_number.h"
 #include "damageable.h"
 
 

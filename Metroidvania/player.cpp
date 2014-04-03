@@ -9,6 +9,7 @@
 #include "animated_sprite.h"
 #include "graphics.h"
 #include "map.h"
+#include "pickup.h"
 #include "rectangle.h"
 #include "number_sprite.h"
 #include "particle_system.h"
@@ -76,7 +77,8 @@ Player::Player(Graphics& graphics, ParticleTools& particle_tools, units::Game x,
 	interacting_(false),
 	health_(graphics),
 	invincible_timer_(kInvincibleTime),
-	damage_text_(new DamageText()),
+	damage_text_(new FloatingNumber(FloatingNumber::DAMAGE)),
+	experience_text(FloatingNumber::EXPERIENCE),
 	gun_experience_hud_(graphics),
 	polar_star_(graphics) 
 {
@@ -92,6 +94,9 @@ void Player::update(units::MS elapsed_time_ms, const Map& map) {
 
 	updateX(elapsed_time_ms, map);
 	updateY(elapsed_time_ms, map);
+
+	experience_text.update(elapsed_time_ms);
+	experience_text.setPosition(center_x(), center_y());
 }
 
 void Player::draw(Graphics& graphics) {
@@ -102,6 +107,7 @@ void Player::draw(Graphics& graphics) {
 }
 
 void Player::drawHUD(Graphics& graphics) {
+	experience_text.draw(graphics);
 	if (spriteIsVisible()) {
 		health_.draw(graphics);
 		polar_star_.drawHUD(graphics, gun_experience_hud_);
@@ -170,14 +176,23 @@ void Player::takeDamage(units::HP damage) {
 	if (invincible_timer_.active()) return;
 	
 	health_.takeDamage(damage);
-	damage_text_->setDamage(damage);
+	damage_text_->addValue(damage);
+
+	polar_star_.damageExperience(damage * 2);
 
 	kinematics_y_.velocity = std::min(kinematics_y_.velocity, -kShortJumpSpeed);
 	invincible_timer_.reset();
 }
 
-void Player::collectPickup(const Pickup&) {
-
+void Player::collectPickup(const Pickup& pickup) {
+	if (pickup.type() == Pickup::EXPERIENCE) {
+		polar_star_.collectExperience(pickup.value());
+		experience_text.addValue(pickup.value());
+		gun_experience_hud_.activateFlash();
+	}
+	else if (pickup.type() == Pickup::HEALTH) {
+		health_.addHealth(pickup.value());
+	}
 }
 
 
@@ -193,10 +208,11 @@ void Player::initializeSprites(Graphics& graphics) {
 		ENUM_FOREACH(hFacing, HORIZONTAL_FACING) {
 			ENUM_FOREACH(vFacing, VERTICAL_FACING) {
 				ENUM_FOREACH(sType, STRIDE_TYPE) {
-					initializeSprite(graphics, boost::make_tuple((MotionType)motion,
+					const SpriteState x = (SpriteState)boost::make_tuple((MotionType)motion,
 						(HorizontalFacing)hFacing,
 						(VerticalFacing)vFacing,
-						(StrideType)sType));
+						(StrideType)sType);
+					initializeSprite(graphics, x);
 				}
 			}
 		}
@@ -208,7 +224,7 @@ void Player::initializeSprite(Graphics& graphics, const SpriteState& sprite_stat
 		kCharacterFrame :
 		1 + kCharacterFrame;
 
-	units::Tile tile_x;
+	units::Tile tile_x = 0;
 	switch (sprite_state.motion_type()) {
 		case WALKING:
 			tile_x = kWalkFrame;
@@ -329,41 +345,41 @@ void Player::updateY(units::MS elapsed_time_ms, const Map& map) {
 	MapCollidable::updateY(kCollisionRectangle, accelerator, kinematics_x_, kinematics_y_, elapsed_time_ms, map);
 }
 
-void Player::onCollision(MapCollidable::SideType side, bool is_delta_direction) {
+void Player::onCollision(sides::SideType side, bool is_delta_direction) {
 	switch (side) {
-		case MapCollidable::TOP_SIDE:
+		case sides::TOP_SIDE:
 			if (is_delta_direction)
 				kinematics_y_.velocity = 0.0f;
 			particle_tools_.front_system.addNewParticle(boost::shared_ptr<Particle>(
 				new HeadBumpParticle(particle_tools_.graphics, center_x(), kinematics_y_.position + kCollisionRectangle.boundingBox().top())));
 			break;
-		case MapCollidable::BOTTOM_SIDE:
+		case sides::BOTTOM_SIDE:
 			on_ground_ = true;
 			if (is_delta_direction)
 				kinematics_y_.velocity = 0.0f;
 			break;
-		case MapCollidable::LEFT_SIDE:
+		case sides::LEFT_SIDE:
 			if (is_delta_direction)
 				kinematics_x_.velocity = 0.0f;
 			break;
-		case MapCollidable::RIGHT_SIDE:
+		case sides::RIGHT_SIDE:
 			if (is_delta_direction)
 				kinematics_x_.velocity = 0.0f;
 			break;
 	}
 }
 
-void Player::onDelta(MapCollidable::SideType side) {
+void Player::onDelta(sides::SideType side) {
 	switch (side) {
-		case MapCollidable::TOP_SIDE:
+		case sides::TOP_SIDE:
 			on_ground_ = false;
 		break;
-		case MapCollidable::BOTTOM_SIDE:
+		case sides::BOTTOM_SIDE:
 			on_ground_ = false;
 		break;
-	case MapCollidable::LEFT_SIDE:
+	case sides::LEFT_SIDE:
 		break;
-	case MapCollidable::RIGHT_SIDE:
+	case sides::RIGHT_SIDE:
 		break;
 	}
 }

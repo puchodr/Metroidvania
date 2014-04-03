@@ -12,6 +12,9 @@
 #include "timer.h"
 #include "death_cloud_particle.h"
 
+#include "energy_crystal.h"
+#include "flashing_pickup.h"
+
 namespace {
 	const units::FPS kFps = 60;
 	const units::MS kMaxFrameTime = 5 * 1000 / 60;
@@ -40,7 +43,7 @@ void Game::eventLoop() {
 	ParticleTools particle_tools = { front_particle_system_, entity_particle_system_, graphics };
 	player_.reset(new Player(graphics, particle_tools, units::tileToGame(kScreenWidth / 2), units::tileToGame(kScreenHeight / 2)));
 	damage_texts_.addDamageable(player_);
-	bat_.reset(new FirstCaveBat(graphics, units::tileToGame(7), units::tileToGame(kScreenHeight / 2 + 1)));
+	bat_.reset(new FirstCaveBat(graphics, units::tileToGame(7), units::tileToGame(kScreenHeight / 2)));
 	damage_texts_.addDamageable(bat_);
 	map_.reset(Map::createTestMap(graphics));
 
@@ -112,7 +115,7 @@ void Game::eventLoop() {
 
 		/* TODO TESTING REMOVE LATER */
 		if (input.wasKeyPressed(SDLK_1)) {
-			bat_.reset(new FirstCaveBat(graphics, units::tileToGame(7), units::tileToGame(kScreenHeight / 2 + 1)));
+			bat_.reset(new FirstCaveBat(graphics, units::tileToGame(7), units::tileToGame(kScreenHeight / 2)));
 		}
 		if (input.wasKeyPressed(SDLK_2)) {
 			player_.reset(new Player(graphics, particle_tools, units::tileToGame(kScreenWidth / 2), units::tileToGame(kScreenHeight / 2)));
@@ -136,6 +139,7 @@ void Game::eventLoop() {
 void Game::update(units::MS elapsed_time_ms, Graphics& graphics) {
 	Timer::updateAll(elapsed_time_ms);
 	damage_texts_.update(elapsed_time_ms);
+	pickups_.update(elapsed_time_ms, *map_);
 	front_particle_system_.update(elapsed_time_ms);
 	entity_particle_system_.update(elapsed_time_ms);
 
@@ -143,6 +147,12 @@ void Game::update(units::MS elapsed_time_ms, Graphics& graphics) {
 	player_->update(elapsed_time_ms, *map_);
 	if (bat_) {
 		if (!bat_->update(elapsed_time_ms, player_->center_x())) {
+			for (int i = 0; i < 3; ++i) {
+				pickups_.add(boost::shared_ptr<Pickup>(
+					new EnergyCrystal(graphics, bat_->center_x(), bat_->center_y(), EnergyCrystal::MEDIUM)));
+			}
+
+			pickups_.add(FlashingPickup::heartPickup(graphics, bat_->center_x(), bat_->center_y()));
 			DeathCloudParticle::createRandomDeathClouds(particle_tools,
 				bat_->center_x(), bat_->center_y(), 3);
 			bat_.reset();
@@ -162,6 +172,8 @@ void Game::update(units::MS elapsed_time_ms, Graphics& graphics) {
 			player_->takeDamage(bat_->contactDamage());
 		}
 	}
+
+	pickups_.handleCollision(*player_);
 }
 
 void Game::draw(Graphics& graphics) {
@@ -172,6 +184,7 @@ void Game::draw(Graphics& graphics) {
 	}
 
 	entity_particle_system_.draw(graphics);
+	pickups_.draw(graphics);
 	player_->draw(graphics);
 	map_->draw(graphics);
 	front_particle_system_.draw(graphics);

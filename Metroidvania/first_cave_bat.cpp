@@ -21,7 +21,7 @@ FirstCaveBat::FirstCaveBat(Graphics& graphics, units::Game x, units::Game y) :
 	facing_(RIGHT),
 	flight_angle_(0.0f),
 	damage_timer_(0),
-	damage_text_(new DamageText())
+	damage_text_(new FloatingNumber(FloatingNumber::DAMAGE))
 {
 	initializeSprites(graphics);
 }

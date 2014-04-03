@@ -10,7 +10,7 @@
 #include "varying_width_sprite.h"
 #include "rectangle.h"
 #include "number_sprite.h"
-#include "damage_text.h"
+#include "floating_number.h"
 #include "damageable.h"
 #include "polar_star.h"
 #include "gun_experience_hud.h"
@@ -50,7 +50,7 @@ struct Player : public Damageable,
 	units::Game center_x() const { return kinematics_x_.position + units::kHalfTile; }
 	units::Game center_y() const { return kinematics_y_.position + units::kHalfTile; }
 
-	boost::shared_ptr<DamageText> get_damage_text() { return damage_text_; }
+	boost::shared_ptr<FloatingNumber> get_damage_text() { return damage_text_; }
 
 	std::vector<boost::shared_ptr<Projectile> > getProjectiles()
 		{ return polar_star_.getProjectiles(); }
@@ -102,10 +102,14 @@ struct Player : public Damageable,
 
 			void update(units::MS elapsed_time);
 			void draw(Graphics& graphics);
+
 			// returns true if health == 0, i.e dead.
 			bool takeDamage(units::HP damage);
+			void addHealth(units::HP health);
 			
 			private:
+				void resetFillSprites();
+				
 				units::HP damage_;
 				Timer damage_timer_;
 
@@ -123,8 +127,8 @@ struct Player : public Damageable,
 		void updateX(units::MS elapsed_time_ms, const Map& map);
 		void updateY(units::MS elapsed_time_ms, const Map& map);
 
-		void onCollision(MapCollidable::SideType side, bool is_delta_direction);
-		void onDelta(MapCollidable::SideType side);
+		void onCollision(sides::SideType side, bool is_delta_direction);
+		void onDelta(sides::SideType side);
 
 		bool spriteIsVisible() const;
 
@@ -147,7 +151,8 @@ struct Player : public Damageable,
 		
 		Health health_;
 		Timer invincible_timer_;
-		boost::shared_ptr<DamageText> damage_text_;
+		boost::shared_ptr<FloatingNumber> damage_text_;
+		FloatingNumber experience_text;
 
 		WalkingAnimation walking_animation_;
 

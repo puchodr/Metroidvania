@@ -4,7 +4,7 @@
 #include "sprite_state.h"
 #include "units.h"
 #include "rectangle.h"
-#include "damage_text.h"
+#include "floating_number.h"
 #include "damageable.h"
 
 struct Graphics;
@@ -22,12 +22,12 @@ struct FirstCaveBat : public Damageable {
 		{ return Rectangle(x_, y_, units::tileToGame(1), units::tileToGame(1)); }
 
 	units::HP contactDamage() const;
-	void takeDamage(units::HP damage) { damage_text_->setDamage(damage); alive_ = false; }
+	void takeDamage(units::HP damage) { damage_text_->addValue(damage); alive_ = false; }
 
 	units::Game center_x() const { return x_ + units::kHalfTile; }
 	units::Game center_y() const { return y_ + units::kHalfTile; }
 
-	boost::shared_ptr<DamageText> get_damage_text() { return damage_text_; }
+	boost::shared_ptr<FloatingNumber> get_damage_text() { return damage_text_; }
 
 	private:
 		typedef boost::tuple<HorizontalFacing> SpriteTuple;
@@ -48,7 +48,7 @@ struct FirstCaveBat : public Damageable {
 		units::Degrees flight_angle_;
 		std::map<SpriteState, boost::shared_ptr<Sprite> > sprites_;
 		Timer damage_timer_;
-		boost::shared_ptr<DamageText> damage_text_;
+		boost::shared_ptr<FloatingNumber> damage_text_;
 };
 
 #endif // FIRST_CAVE_BAT_H_

@@ -8,6 +8,8 @@
 #include "damage_texts.h"
 #include "particle_system.h"
 
+#include "pickups.h"
+
 struct Graphics;
 struct Player;
 struct FirstCaveBat;
@@ -30,8 +32,8 @@ struct Game {
 		boost::scoped_ptr<Map> map_;
 
 		DamageTexts damage_texts_;
-		ParticleSystem front_particle_system_;
-		ParticleSystem entity_particle_system_;
+		ParticleSystem front_particle_system_, entity_particle_system_;
+		Pickups pickups_;
 };
 
 #endif // GAME_H_

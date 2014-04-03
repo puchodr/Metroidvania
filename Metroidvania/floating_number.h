@@ -1,15 +1,20 @@
-#ifndef DAMAGE_TEXT_H_
-#define DAMAGE_TEXT_H_
+#ifndef FLOATING_NUMBER_H_
+#define FLOATING_NUMBER_H_
 
 #include "units.h"
 #include "timer.h"
 
 struct Graphics;
 
-struct DamageText {
-	DamageText();
+struct FloatingNumber {
+	enum NumberType {
+		DAMAGE,
+		EXPERIENCE,
+	};
 
-	void setDamage(units::HP damage);
+	FloatingNumber(NumberType type);
+
+	void addValue(int value);
 	bool update(units::MS elapsed_time);
 	void setPosition(units::Game center_x, units::Game center_y);
 	void draw(Graphics& graphics);
@@ -17,10 +22,10 @@ struct DamageText {
 	private:
 		bool should_rise_;
 		units::Game center_x_, center_y_;
-		units::HP damage_;
+		int value_;
 		units::Game offset_y_;
 		Timer timer_;
+		const NumberType type_;
 };
 
-
-#endif // DAMAGE_TEXT_H_
+#endif // FLOATING_NUMBER_H_

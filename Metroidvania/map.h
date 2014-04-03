@@ -5,26 +5,16 @@
 #include <boost/scoped_ptr.hpp>
 #include <vector>
 
-#include "units.h"
 #include "backdrop.h"
+#include "collision_tile.h"
+#include "tile_type.h"
+#include "units.h"
 
 struct Graphics;
 struct Sprite;
 struct Rectangle;
 
 struct Map {
-	enum TileType {
-		AIR_TILE,
-		WALL_TILE,
-	}; 
-	struct CollisionTile {
-		CollisionTile(units::Tile row, units::Tile col, TileType tile_type) :
-			row(row),
-			col(col),
-			tile_type(tile_type) {}
-		units::Tile row, col;
-		TileType tile_type;
-	};
 	static Map* createTestMap(Graphics& graphics);
 
 	std::vector<CollisionTile> getCollidingTiles(const Rectangle& rectangle) const;
@@ -34,12 +24,12 @@ struct Map {
 
 	private:
 		struct Tile {
-			Tile(TileType tile_type=AIR_TILE,
+			Tile(tiles::TileType tile_type=tiles::AIR_TILE,
 			     boost::shared_ptr<Sprite> sprite = boost::shared_ptr<Sprite>()) :
 			   tile_type(tile_type),
 			   sprite(sprite) {}
 
-			TileType tile_type;
+			tiles::TileType tile_type;
 			boost::shared_ptr<Sprite> sprite;
 		};
 

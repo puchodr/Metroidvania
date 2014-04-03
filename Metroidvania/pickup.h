@@ -16,7 +16,7 @@ struct Pickup {
 	virtual Rectangle collisionRectangle() const = 0;
 	virtual bool update(units::MS elapsed_time_ms, const Map& map) = 0;
 	virtual void draw(Graphics& graphics) = 0;
-	virtual int value() = 0;
+	virtual int value() const = 0;
 	virtual PickupType type() const = 0;
 	virtual ~Pickup() = 0;
 };
