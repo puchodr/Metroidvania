@@ -45,7 +45,7 @@ void Game::eventLoop() {
 	damage_texts_.addDamageable(player_);
 	bat_.reset(new FirstCaveBat(graphics, units::tileToGame(7), units::tileToGame(kScreenHeight / 2)));
 	damage_texts_.addDamageable(bat_);
-	map_.reset(Map::createTestMap(graphics));
+	map_.reset(Map::createSlopeTestMap(graphics));
 
 	bool running = true;
 	units::MS last_update_time = SDL_GetTicks();
