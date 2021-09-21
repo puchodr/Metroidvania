@@ -35,12 +35,12 @@ void Player::WalkingAnimation::reset() {
 Player::StrideType Player::WalkingAnimation::stride() const {
 	switch (current_index_) {
 		case 0:
-			return STRIDE_LEFT;
+			return StrideType::STRIDE_LEFT;
 		case 1:
-			return STRIDE_MIDDLE;
+			return StrideType::STRIDE_MIDDLE;
 		case 2:
-			return STRIDE_RIGHT;
+			return StrideType::STRIDE_RIGHT;
 		default:
-			return STRIDE_MIDDLE;
+			return StrideType::STRIDE_MIDDLE;
 	}
 }

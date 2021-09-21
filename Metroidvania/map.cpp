@@ -7,7 +7,6 @@
 
 using namespace tiles;
 
-using boost::shared_ptr;
 using std::vector;
 
 // static
@@ -21,14 +20,14 @@ Map* Map::createSlopeTestMap(Graphics& graphics) {
 	map->tiles_ = vector<vector<Tile> >(
 		num_rows, vector<Tile>(
 		num_cols, Tile()));
-	map->background_tiles_ = vector<vector<boost::shared_ptr<Sprite> > >(
-		num_rows, vector<boost::shared_ptr<Sprite> >(
-		num_cols, boost::shared_ptr<Sprite>()));
+	map->background_tiles_ = vector<vector<std::shared_ptr<Sprite> > >(
+		num_rows, vector<std::shared_ptr<Sprite> >(
+		num_cols, std::shared_ptr<Sprite>()));
 
 	
 	Tile wall_tile(
 			TileType().set(WALL), 
-			shared_ptr<Sprite>(new Sprite(
+			std::shared_ptr<Sprite>(new Sprite(
 					graphics,
 					"PrtCave",
 					units::tileToPixel(1), 0,
@@ -53,7 +52,7 @@ Map* Map::createSlopeTestMap(Graphics& graphics) {
 					set(i / 2 % 2 == 0 ? LEFT_SLOPE : RIGHT_SLOPE).
 					set(i / 4 == 0 ? TOP_SLOPE : BOTTOM_SLOPE).
 					set((i + 1) / 2 % 2 == 0 ? TALL_SLOPE : SHORT_SLOPE),
-					shared_ptr<Sprite>(new Sprite(
+					std::shared_ptr<Sprite>(new Sprite(
 							graphics, "PrtCave",
 							units::tileToPixel(2 + i % 4), units::tileToPixel(i / 4),
 							units::tileToPixel(1), units::tileToPixel(1))));
@@ -114,13 +113,13 @@ Map* Map::createTestMap(Graphics& graphics) {
 	map->tiles_ = vector<vector<Tile> >(
 		num_rows, vector<Tile>(
 		num_cols, Tile()));
-	map->background_tiles_ = vector<vector<boost::shared_ptr<Sprite> > >(
-		num_rows, vector<boost::shared_ptr<Sprite> >(
-		num_cols, boost::shared_ptr<Sprite>()));
+	map->background_tiles_ = vector<vector<std::shared_ptr<Sprite> > >(
+		num_rows, vector<std::shared_ptr<Sprite> >(
+		num_cols, std::shared_ptr<Sprite>()));
 
 	Tile wall_tile(
 			TileType().set(WALL), 
-			shared_ptr<Sprite>(new Sprite(
+			std::shared_ptr<Sprite>(new Sprite(
 					graphics,
 					"PrtCave",
 					units::tileToPixel(1), 0,
@@ -136,17 +135,17 @@ Map* Map::createTestMap(Graphics& graphics) {
 	map->tiles_[7][2] = wall_tile;
 	map->tiles_[10][3] = wall_tile;
 
-	shared_ptr<Sprite> chainTop(new Sprite(
+	std::shared_ptr<Sprite> chainTop(new Sprite(
 		graphics,
 		"PrtCave",
 		units::tileToPixel(11), units::tileToPixel(2),
 		units::tileToPixel(1), units::tileToPixel(1)));
-	shared_ptr<Sprite> chainMiddle(new Sprite(
+	std::shared_ptr<Sprite> chainMiddle(new Sprite(
 		graphics,
 		"PrtCave",
 		units::tileToPixel(12), units::tileToPixel(2),
 		units::tileToPixel(1), units::tileToPixel(1)));
-	shared_ptr<Sprite> chainBottom(new Sprite(
+	std::shared_ptr<Sprite> chainBottom(new Sprite(
 		graphics,
 		"PrtCave",
 		units::tileToPixel(13), units::tileToPixel(2),

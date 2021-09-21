@@ -30,19 +30,22 @@ struct PolarStar {
 				   ParticleTools& particle_tools);
 	void stopFire() {}
 
-	std::vector<boost::shared_ptr< ::Projectile> > getProjectiles();
+	std::vector<std::shared_ptr< ::Projectile> > getProjectiles();
 
 	private:
-		typedef boost::tuple<HorizontalFacing, VerticalFacing> SpriteTuple;
-		struct SpriteState : public SpriteTuple {
-			SpriteState(SpriteTuple& tuple) : SpriteTuple(tuple) {}
+		typedef std::tuple<HorizontalFacing, VerticalFacing> SpriteTuple;
+		struct SpriteState {
+			SpriteState(SpriteTuple& tuple) : tuple_(tuple) {}
+			SpriteState(const SpriteState& ss) : tuple_(ss.tuple_) {}
+			bool operator<(const SpriteState& ss) const { return tuple_ < ss.tuple_; }
 
-			HorizontalFacing horizontal_facing() const { return get<0>(); }
-			VerticalFacing vertical_facing() const { return get<1>(); }
+			HorizontalFacing horizontal_facing() const { return std::get<0>(tuple_); }
+			VerticalFacing vertical_facing() const { return std::get<1>(tuple_); }
+			SpriteTuple tuple_;
 		};
 
 		struct Projectile : public ::Projectile {
-			Projectile(boost::shared_ptr<Sprite> sprite,
+			Projectile(std::shared_ptr<Sprite> sprite,
 					   HorizontalFacing horizontal_direction,
 					   VerticalFacing vertical_direction,
 					   units::Game x, units::Game y,
@@ -61,7 +64,7 @@ struct PolarStar {
 				units::Game getX() const;
 				units::Game getY() const;
 
-				boost::shared_ptr<Sprite> sprite_;
+				std::shared_ptr<Sprite> sprite_;
 				const HorizontalFacing horizontal_direction_;
 				const VerticalFacing vertical_direction_;
 				const units::Game x_, y_;
@@ -71,7 +74,7 @@ struct PolarStar {
 		};
 
 		units::Game gun_x(HorizontalFacing horizontal_facing, units::Game player_x) const
-			{ return horizontal_facing == LEFT ? player_x - units::kHalfTile : player_x; }
+			{ return horizontal_facing == HorizontalFacing::LEFT ? player_x - units::kHalfTile : player_x; }
 		units::Game gun_y(VerticalFacing vertical_facing, bool gun_up, units::Game player_y) const;
 
 		void initializeSprites(Graphics& graphics);
@@ -80,12 +83,12 @@ struct PolarStar {
 		units::GunLevel current_level() const;
 
 		units::GunExperience current_experience_;
-		std::map<SpriteState, boost::shared_ptr<Sprite> > sprite_map_;
-		boost::shared_ptr<Sprite> horizontal_projectiles_[units::kMaxGunLevel];
-		boost::shared_ptr<Sprite> vertical_projectiles_[units::kMaxGunLevel];
+		std::map<SpriteState, std::shared_ptr<Sprite> > sprite_map_;
+		std::shared_ptr<Sprite> horizontal_projectiles_[units::kMaxGunLevel];
+		std::shared_ptr<Sprite> vertical_projectiles_[units::kMaxGunLevel];
 
-		boost::shared_ptr<Projectile> projectile_a_;
-		boost::shared_ptr<Projectile> projectile_b_;
+		std::shared_ptr<Projectile> projectile_a_;
+		std::shared_ptr<Projectile> projectile_b_;
 
 };
 

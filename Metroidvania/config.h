@@ -2,7 +2,7 @@
 #define CONFIG_H_
 
 namespace config {
-	enum GraphicsQuality {
+	enum class GraphicsQuality {
 		HIGH_QUALITY,
 		ORIGINAL_QUALITY
 	};

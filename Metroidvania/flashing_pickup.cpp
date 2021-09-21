@@ -67,10 +67,10 @@ void FlashingPickup::draw(Graphics& graphics) {
 }
 
 // static
-boost::shared_ptr<Pickup> FlashingPickup::heartPickup(
+std::shared_ptr<Pickup> FlashingPickup::heartPickup(
 		Graphics& graphics,
 		units::Game center_x, units::Game center_y) {
-	return boost::shared_ptr<Pickup>(new FlashingPickup(
+	return std::shared_ptr<Pickup>(new FlashingPickup(
 			graphics,
 			center_x, center_y,
 			kHeartSourceX, kHeartSourceY,
@@ -80,10 +80,10 @@ boost::shared_ptr<Pickup> FlashingPickup::heartPickup(
 }
 
 // static
-boost::shared_ptr<Pickup> FlashingPickup::multiHeartPickup(
+std::shared_ptr<Pickup> FlashingPickup::multiHeartPickup(
 		Graphics& graphics,
 		units::Game center_x, units::Game center_y) {
-	return boost::shared_ptr<Pickup>(new FlashingPickup(
+	return std::shared_ptr<Pickup>(new FlashingPickup(
 			graphics,
 			center_x, center_y,
 			kMultiHeartSourceX, kMultiHeartSourceY,

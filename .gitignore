@@ -23,6 +23,7 @@
 *.pch
 *.vspscc
 *.vssscc
+.vs
 *_i.c
 *_p.c
 *.ncb

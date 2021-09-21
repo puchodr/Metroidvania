@@ -1,7 +1,7 @@
 #ifndef NUMBER_SPRITE_H_
 #define NUMBER_SPRITE_H_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include <vector>
 
 #include "units.h"
@@ -39,7 +39,7 @@ struct NumberSprite {
 		units::Game height() const { return units::kHalfTile; }
 
 		units::Game padding_;
-		std::vector<boost::shared_ptr<Sprite> > reversed_glyphs_;
+		std::vector<std::shared_ptr<Sprite> > reversed_glyphs_;
 };
 
 

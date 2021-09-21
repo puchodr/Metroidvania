@@ -1,8 +1,9 @@
 #include "game.h"
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 #include <stdlib.h>
 #include <time.h>
+#include <algorithm>
 
 #include "graphics.h"
 #include "player.h"
@@ -60,23 +61,26 @@ void Game::eventLoop() {
 				case SDL_KEYUP:
 					input.keyUpEvent(event);
 					break;
+				case SDL_QUIT:
+					running = false;
+					break;
 				default:
 					break;
 			}
 		}
 
 		// Checks if escape was pressed.
-		running = !input.wasKeyPressed(SDLK_ESCAPE);
+		running = !input.wasKeyPressed(SDL_SCANCODE_ESCAPE);
 
 		// Player Horizontal Movement
 		// if both left and right are being pressed, stop moving
-		if (input.isKeyHeld(SDLK_LEFT) && input.isKeyHeld(SDLK_RIGHT)) {
+		if (input.isKeyHeld(SDL_SCANCODE_LEFT) && input.isKeyHeld(SDL_SCANCODE_RIGHT)) {
 			player_->stopMoving();
 		}
-		else if (input.isKeyHeld(SDLK_LEFT)) {
+		else if (input.isKeyHeld(SDL_SCANCODE_LEFT)) {
 			player_->startMovingLeft();
 		}
-		else if (input.isKeyHeld(SDLK_RIGHT)) {
+		else if (input.isKeyHeld(SDL_SCANCODE_RIGHT)) {
 			player_->startMovingRight();
 		} 
 		else {
@@ -84,13 +88,13 @@ void Game::eventLoop() {
 		}
 
 		// Player Look Direction.
-		if (input.isKeyHeld(SDLK_UP) && input.isKeyHeld(SDLK_DOWN)) {
+		if (input.isKeyHeld(SDL_SCANCODE_UP) && input.isKeyHeld(SDL_SCANCODE_DOWN)) {
 			player_->lookHorizontal();
 		}
-		else if (input.isKeyHeld(SDLK_UP)) {
+		else if (input.isKeyHeld(SDL_SCANCODE_UP)) {
 			player_->lookUp();
 		}
-		else if (input.isKeyHeld(SDLK_DOWN)) {
+		else if (input.isKeyHeld(SDL_SCANCODE_DOWN)) {
 			player_->lookDown();
 		}
 		else {
@@ -98,26 +102,26 @@ void Game::eventLoop() {
 		}
 
 		// Player Fire
-		if (input.wasKeyPressed(SDLK_x)) {
+		if (input.wasKeyPressed(SDL_SCANCODE_X)) {
 			player_->startFire();
 		}
-		else if (input.wasKeyReleased(SDLK_x)) {
+		else if (input.wasKeyReleased(SDL_SCANCODE_X)) {
 			player_->stopFire();
 		}
 
 		// Player Jump
-		if (input.wasKeyPressed(SDLK_z)) {
+		if (input.wasKeyPressed(SDL_SCANCODE_Z)) {
 			player_->startJump();
 		}
-		else if (input.wasKeyReleased(SDLK_z)) {
+		else if (input.wasKeyReleased(SDL_SCANCODE_Z)) {
 			player_->stopJump();
 		}
 
 		/* TODO TESTING REMOVE LATER */
-		if (input.wasKeyPressed(SDLK_1)) {
+		if (input.wasKeyPressed(SDL_SCANCODE_1)) {
 			bat_.reset(new FirstCaveBat(graphics, units::tileToGame(7), units::tileToGame(kScreenHeight / 2)));
 		}
-		if (input.wasKeyPressed(SDLK_2)) {
+		if (input.wasKeyPressed(SDL_SCANCODE_2)) {
 			player_.reset(new Player(graphics, particle_tools, units::tileToGame(kScreenWidth / 2), units::tileToGame(kScreenHeight / 2)));
 		}
 		/* TODO TESTING REMOVE LATER */
@@ -148,7 +152,7 @@ void Game::update(units::MS elapsed_time_ms, Graphics& graphics) {
 	if (bat_) {
 		if (!bat_->update(elapsed_time_ms, player_->center_x())) {
 			for (int i = 0; i < 3; ++i) {
-				pickups_.add(boost::shared_ptr<Pickup>(
+				pickups_.add(std::shared_ptr<Pickup>(
 					new EnergyCrystal(graphics, bat_->center_x(), bat_->center_y(), EnergyCrystal::MEDIUM)));
 			}
 
@@ -160,7 +164,7 @@ void Game::update(units::MS elapsed_time_ms, Graphics& graphics) {
 	}
 
 	if (bat_) {
-		std::vector<boost::shared_ptr<Projectile> > projectiles(player_->getProjectiles());
+		std::vector<std::shared_ptr<Projectile> > projectiles(player_->getProjectiles());
 		for (size_t i = 0; i < projectiles.size(); ++i) {
 			if (bat_->collisionRectangle().collidesWith(projectiles[i]->collisionRectangle())) {
 				bat_->takeDamage(projectiles[i]->contactDamage());

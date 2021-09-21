@@ -1,7 +1,7 @@
 #ifndef FLASHING_PICKUP_H_
 #define FLASHING_PICKUP_H_
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 #include "pickup.h"
 #include "sprite.h"
@@ -15,10 +15,10 @@ struct FlashingPickup : Pickup {
 	int value() const { return value_; }
 	PickupType type() const { return type_; }
 
-	static boost::shared_ptr<Pickup> heartPickup(
+	static std::shared_ptr<Pickup> heartPickup(
 		Graphics& graphics,
 		units::Game center_x, units::Game center_y);
-	static boost::shared_ptr<Pickup> multiHeartPickup(
+	static std::shared_ptr<Pickup> multiHeartPickup(
 		Graphics& graphics,
 		units::Game center_x, units::Game center_y);
 	

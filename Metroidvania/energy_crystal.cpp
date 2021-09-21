@@ -68,10 +68,10 @@ int EnergyCrystal::value() const {
 }
 
 void EnergyCrystal::onCollision(sides::SideType side, bool is_delta_direction) {
-	if (side == sides::TOP_SIDE) {
+	if (side == sides::SideType::TOP_SIDE) {
 		kinematics_y_.velocity = 0;
 	}
-	else if (side == sides::BOTTOM_SIDE) {
+	else if (side == sides::SideType::BOTTOM_SIDE) {
 		kinematics_y_.velocity = -kBounceSpeed;
 	}
 	else {

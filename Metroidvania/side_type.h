@@ -4,7 +4,7 @@
 #include "sprite_state.h"
 
 namespace sides {
-	enum SideType {
+	enum class SideType {
 		TOP_SIDE,
 		BOTTOM_SIDE,
 		LEFT_SIDE,
@@ -12,20 +12,20 @@ namespace sides {
 	};
 
 	inline SideType opposite_side(SideType side) {
-		if (side == TOP_SIDE) {
-			return BOTTOM_SIDE;
+		if (side == SideType::TOP_SIDE) {
+			return SideType::BOTTOM_SIDE;
 		}
-		if (side == BOTTOM_SIDE) {
-			return TOP_SIDE;
+		if (side == SideType::BOTTOM_SIDE) {
+			return SideType::TOP_SIDE;
 		}
-		if (side == LEFT_SIDE) {
-			return RIGHT_SIDE;
+		if (side == SideType::LEFT_SIDE) {
+			return SideType::RIGHT_SIDE;
 		}
-		return LEFT_SIDE;
+		return SideType::LEFT_SIDE;
 	}
 
 	inline bool vertical(SideType side) {
-		return side == TOP_SIDE || side == BOTTOM_SIDE;
+		return side == SideType::TOP_SIDE || side == SideType::BOTTOM_SIDE;
 	}
 
 	inline bool horizontal(SideType side) {
@@ -33,17 +33,17 @@ namespace sides {
 	}
 
 	inline SideType from_facing(HorizontalFacing h_facing, VerticalFacing v_facing) {
-		if (v_facing == UP) 
-			return TOP_SIDE;
-		if (v_facing == DOWN) 
-			return BOTTOM_SIDE;
-		if (h_facing == LEFT)
-			return LEFT_SIDE;
-		return RIGHT_SIDE;
+		if (v_facing == VerticalFacing::UP) 
+			return SideType::TOP_SIDE;
+		if (v_facing == VerticalFacing::DOWN) 
+			return SideType::BOTTOM_SIDE;
+		if (h_facing == HorizontalFacing::LEFT)
+			return SideType::LEFT_SIDE;
+		return SideType::RIGHT_SIDE;
 	}
 
 	inline bool is_max(SideType side) {
-		return side == RIGHT_SIDE || side == BOTTOM_SIDE;
+		return side == SideType::RIGHT_SIDE || side == SideType::BOTTOM_SIDE;
 	}
 	inline bool is_min(SideType side) {
 		return !is_max(side);

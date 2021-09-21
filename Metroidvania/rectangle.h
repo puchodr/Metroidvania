@@ -15,11 +15,11 @@ struct Rectangle {
 	units::Game center_y() const { return y_ + height_ / 2; }
 
 	units::Game side(sides::SideType side) const {
-		if (side == sides::LEFT_SIDE)
+		if (side == sides::SideType::LEFT_SIDE)
 			return left();
-		if (side == sides::RIGHT_SIDE)
+		if (side == sides::SideType::RIGHT_SIDE)
 			return right();
-		if (side == sides::TOP_SIDE)
+		if (side == sides::SideType::TOP_SIDE)
 			return top();
 		return bottom();
 	}

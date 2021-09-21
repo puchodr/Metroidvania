@@ -1,8 +1,7 @@
 #ifndef MAP_H_
 #define MAP_H_
 
-#include <boost/shared_ptr.hpp>
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 #include <vector>
 
 #include "backdrop.h"
@@ -28,16 +27,16 @@ struct Map {
 	private:
 		struct Tile {
 			Tile(tiles::TileType tile_type=tiles::TileType().set(tiles::EMPTY),
-			     boost::shared_ptr<Sprite> sprite = boost::shared_ptr<Sprite>()) :
+			     std::shared_ptr<Sprite> sprite = std::shared_ptr<Sprite>()) :
 			   tile_type(tile_type),
 			   sprite(sprite) {}
 
 			tiles::TileType tile_type;
-			boost::shared_ptr<Sprite> sprite;
+			std::shared_ptr<Sprite> sprite;
 		};
 
-		boost::scoped_ptr<Backdrop> backdrop_;
-		std::vector<std::vector<boost::shared_ptr<Sprite> > > background_tiles_;
+		std::unique_ptr<Backdrop> backdrop_;
+		std::vector<std::vector<std::shared_ptr<Sprite> > > background_tiles_;
 		std::vector<std::vector<Tile> > tiles_;
 };
 

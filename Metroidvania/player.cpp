@@ -1,6 +1,6 @@
 #include "player.h"
 
-#include <cmath>
+#include <algorithm>
 
 #include "accelerators.h"
 #include "composite_collision_rectangle.h"
@@ -14,6 +14,8 @@
 #include "number_sprite.h"
 #include "particle_system.h"
 #include "head_bump_particle.h"
+
+#include <iostream>
 
 namespace {
 	// Walk Motion
@@ -70,8 +72,8 @@ Player::Player(Graphics& graphics, ParticleTools& particle_tools, units::Game x,
 	kinematics_x_(x, 0.0f),
 	kinematics_y_(y, 0.0f),
 	acceleration_x_(0),
-	horizontal_facing_(LEFT),
-	intended_vertical_facing(HORIZONTAL),
+	horizontal_facing_(HorizontalFacing::LEFT),
+	intended_vertical_facing(VerticalFacing::HORIZONTAL),
 	on_ground_(false),
 	jump_active_(false),
 	interacting_(false),
@@ -119,7 +121,7 @@ void Player::startMovingLeft() {
 		walking_animation_.reset();
 	}
 	acceleration_x_ = -1;
-	horizontal_facing_ = LEFT;
+	horizontal_facing_ = HorizontalFacing::LEFT;
 	interacting_ = false;
 }
 
@@ -128,7 +130,7 @@ void Player::startMovingRight() {
 		walking_animation_.reset();
 	}
 	acceleration_x_ = 1;
-	horizontal_facing_ = RIGHT;
+	horizontal_facing_ = HorizontalFacing::RIGHT;
 	interacting_ = false;
 }
 
@@ -137,18 +139,18 @@ void Player::stopMoving() {
 }
 
 void Player::lookUp() {
-	intended_vertical_facing = UP;
+	intended_vertical_facing = VerticalFacing::UP;
 	interacting_ = false;
 }
 
 void Player::lookDown() {
-	if (intended_vertical_facing == DOWN) return;
-	intended_vertical_facing = DOWN;
+	if (intended_vertical_facing == VerticalFacing::DOWN) return;
+	intended_vertical_facing = VerticalFacing::DOWN;
 	interacting_ = on_ground();
 }
 
 void Player::lookHorizontal() {
-	intended_vertical_facing = HORIZONTAL;
+	intended_vertical_facing = VerticalFacing::HORIZONTAL;
 }
 
 void Player::startFire() {
@@ -208,11 +210,12 @@ void Player::initializeSprites(Graphics& graphics) {
 		ENUM_FOREACH(hFacing, HORIZONTAL_FACING) {
 			ENUM_FOREACH(vFacing, VERTICAL_FACING) {
 				ENUM_FOREACH(sType, STRIDE_TYPE) {
-					const SpriteState x = (SpriteState)boost::make_tuple((MotionType)motion,
+					const SpriteState ss(std::make_tuple((MotionType)motion,
 						(HorizontalFacing)hFacing,
 						(VerticalFacing)vFacing,
-						(StrideType)sType);
-					initializeSprite(graphics, x);
+						(StrideType)sType));
+					std::cout << "something" << std::endl;
+					initializeSprite(graphics, ss);
 				}
 			}
 		}
@@ -220,64 +223,64 @@ void Player::initializeSprites(Graphics& graphics) {
 }
 
 void Player::initializeSprite(Graphics& graphics, const SpriteState& sprite_state) {	
-	units::Tile tile_y = sprite_state.horizontal_facing() == LEFT ?
+	units::Tile tile_y = sprite_state.horizontal_facing() == HorizontalFacing::LEFT ?
 		kCharacterFrame :
 		1 + kCharacterFrame;
 
 	units::Tile tile_x = 0;
 	switch (sprite_state.motion_type()) {
-		case WALKING:
+	case MotionType::WALKING:
 			tile_x = kWalkFrame;
 			break;
-		case STANDING:
+		case MotionType::STANDING:
 			tile_x = kStandFrame;
 			break;
-		case INTERACTING:
+		case MotionType::INTERACTING:
 			tile_x = kBackFrame;
 			break;
-		case JUMPING:
+		case MotionType::JUMPING:
 			tile_x = kJumpFrame;
 			break;
-		case FALLING:
+		case MotionType::FALLING:
 			tile_x = kFallFrame;
 			break;
-		case LAST_MOTION_TYPE:
+		case MotionType::LAST_MOTION_TYPE:
 			break;
 	}
 	switch (sprite_state.vertical_facing()) {
-		case HORIZONTAL:
+		case VerticalFacing::HORIZONTAL:
 			break;
-		case UP:
+		case VerticalFacing::UP:
 			tile_x += kUpFrameOffset;
 			break;
-		case DOWN:
+		case VerticalFacing::DOWN:
 			tile_x = kDownFrame;
 			break;
 		default:
 			break;
 	}
 
-	if (sprite_state.motion_type() == WALKING) {
+	if (sprite_state.motion_type() == MotionType::WALKING) {
 		switch (sprite_state.stride_type()) {
-			case STRIDE_MIDDLE:
+			case StrideType::STRIDE_MIDDLE:
 				break;
-			case STRIDE_LEFT:
+			case StrideType::STRIDE_LEFT:
 				tile_x += 1;
 				break;
-			case STRIDE_RIGHT:
+			case StrideType::STRIDE_RIGHT:
 				tile_x += 2;
 				break;
 			default:
 				break;
 		}
-		sprites_[sprite_state] = boost::shared_ptr<Sprite>(new Sprite(
+		sprites_[sprite_state] = std::shared_ptr<Sprite>(new Sprite(
 			graphics,
 			kSpriteFilePath,
 			units::tileToPixel(tile_x), units::tileToPixel(tile_y), 
 			units::tileToPixel(1), units::tileToPixel(1)));
 	}
 	else {
-		sprites_[sprite_state] = boost::shared_ptr<Sprite>(new Sprite(
+		sprites_[sprite_state] = std::shared_ptr<Sprite>(new Sprite(
 			graphics,
 			kSpriteFilePath,
 			units::tileToPixel(tile_x), units::tileToPixel(tile_y),
@@ -289,23 +292,23 @@ Player::MotionType Player::motionType() const {
 	MotionType motion;
 
 	if (interacting_) {
-		motion = INTERACTING;
+		motion = MotionType::INTERACTING;
 	}
 	else if (on_ground_) {
-		motion = acceleration_x_ == 0 ? STANDING : WALKING;
+		motion = acceleration_x_ == 0 ? MotionType::STANDING : MotionType::WALKING;
 	}
 	else {
-		motion = kinematics_y_.velocity < 0.0f ? JUMPING : FALLING;
+		motion = kinematics_y_.velocity < 0.0f ? MotionType::JUMPING : MotionType::FALLING;
 	}
 	return motion;
 }
 
 Player::SpriteState Player::getSpriteState() {
-	return boost::make_tuple(
+	return SpriteState(std::make_tuple(
 		motionType(),
 		horizontal_facing_,
 		vertical_facing(),
-		walking_animation_.stride());
+		walking_animation_.stride()));
 }
 
 void Player::updateX(units::MS elapsed_time_ms, const Map& map) {
@@ -347,23 +350,23 @@ void Player::updateY(units::MS elapsed_time_ms, const Map& map) {
 
 void Player::onCollision(sides::SideType side, bool is_delta_direction) {
 	switch (side) {
-		case sides::TOP_SIDE:
+	   case sides::SideType::TOP_SIDE:
 			if (is_delta_direction) {
 				kinematics_y_.velocity = 0.0f;
-				particle_tools_.front_system.addNewParticle(boost::shared_ptr<Particle>(
+				particle_tools_.front_system.addNewParticle(std::shared_ptr<Particle>(
 					new HeadBumpParticle(particle_tools_.graphics, center_x(), kinematics_y_.position + kCollisionRectangle.boundingBox().top())));
 			}
 			break;
-		case sides::BOTTOM_SIDE:
+		case sides::SideType::BOTTOM_SIDE:
 			on_ground_ = true;
 			if (is_delta_direction)
 				kinematics_y_.velocity = 0.0f;
 			break;
-		case sides::LEFT_SIDE:
+		case sides::SideType::LEFT_SIDE:
 			if (is_delta_direction)
 				kinematics_x_.velocity = 0.0f;
 			break;
-		case sides::RIGHT_SIDE:
+		case sides::SideType::RIGHT_SIDE:
 			if (is_delta_direction)
 				kinematics_x_.velocity = 0.0f;
 			break;
@@ -372,15 +375,15 @@ void Player::onCollision(sides::SideType side, bool is_delta_direction) {
 
 void Player::onDelta(sides::SideType side) {
 	switch (side) {
-		case sides::TOP_SIDE:
+		case sides::SideType::TOP_SIDE:
 			on_ground_ = false;
 		break;
-		case sides::BOTTOM_SIDE:
+		case sides::SideType::BOTTOM_SIDE:
 			on_ground_ = false;
 		break;
-	case sides::LEFT_SIDE:
+	case sides::SideType::LEFT_SIDE:
 		break;
-	case sides::RIGHT_SIDE:
+	case sides::SideType::RIGHT_SIDE:
 		break;
 	}
 }

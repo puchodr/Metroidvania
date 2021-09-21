@@ -20,7 +20,7 @@ struct EnergyCrystal : Pickup,
 	bool update(units::MS elapsed_time, const Map& map);
 	void draw(Graphics& graphics);
 	int value() const;
-	PickupType type() const { return EXPERIENCE; }
+	PickupType type() const { return PickupType::EXPERIENCE; }
 
 	private:
 		void onCollision(sides::SideType side, bool is_delta_direction);

@@ -1,5 +1,7 @@
 #include "player.h"
 
+#include <algorithm>
+
 namespace {
 	// HUD Constants
 	const units::Game kHealthBarX = units::tileToGame(1);

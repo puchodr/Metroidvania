@@ -37,17 +37,17 @@ namespace {
 	}
 }
 
-boost::optional<units::Game> CollisionTile::testCollision(
+std::optional<units::Game> CollisionTile::testCollision(
 			sides::SideType side,
 			units::Game perpendicular_position,
 			units::Game leading_position,
 			bool should_test_slopes) const {
 	if (tile_type_[WALL]) {
-		if (side == TOP_SIDE)
+		if (side == sides::SideType::TOP_SIDE)
 			return units::tileToGame(row_);
-		if (side == BOTTOM_SIDE)
+		if (side == sides::SideType::BOTTOM_SIDE)
 			return units::tileToGame(row_ + 1);
-		if (side == LEFT_SIDE)
+		if (side == sides::SideType::LEFT_SIDE)
 			return units::tileToGame(col_);
 		// side == RIGHT_SIDE
 		return units::tileToGame(col_ + 1);
@@ -70,5 +70,5 @@ boost::optional<units::Game> CollisionTile::testCollision(
 		if (is_colliding)
 			return calculated_position;
 	}
-	return boost::none;
+	return {};
 }

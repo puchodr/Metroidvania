@@ -2,16 +2,18 @@
 #define TIMER_H_
  
 #include <set>
-#include <boost/noncopyable.hpp>
 
 #include "units.h"
 
-struct Timer : private boost::noncopyable {
+struct Timer {
 	Timer(units::MS expiration_time, bool start_active=false) :
 		current_time_(start_active ? 0 : expiration_time + 1),
 		expiration_time_(expiration_time) { timers_.insert(this); }
 	
 	~Timer() { timers_.erase(this); }
+
+	Timer(const Timer&) = delete; // non-construction copyable
+	Timer& operator=(const Timer&) = delete; // non-copyable
 
 	void reset() { current_time_ = 0; }
 	bool active() const { return current_time_ < expiration_time_; }

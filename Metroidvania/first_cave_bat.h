@@ -27,14 +27,18 @@ struct FirstCaveBat : public Damageable {
 	units::Game center_x() const { return x_ + units::kHalfTile; }
 	units::Game center_y() const { return y_ + units::kHalfTile; }
 
-	boost::shared_ptr<FloatingNumber> get_damage_text() { return damage_text_; }
+	std::shared_ptr<FloatingNumber> get_damage_text() { return damage_text_; }
 
 	private:
-		typedef boost::tuple<HorizontalFacing> SpriteTuple;
-		struct SpriteState : public SpriteTuple {
-			SpriteState(SpriteTuple& tuple) : SpriteTuple(tuple) {}
+		typedef std::tuple<HorizontalFacing> SpriteTuple;
+		struct SpriteState {
+			SpriteState(SpriteTuple& tuple) : tuple_(tuple) {}
+			SpriteState(const SpriteState& ss) : tuple_(ss.tuple_){}
+			bool operator<(const SpriteState& ss) const { return tuple_ < ss.tuple_; }
 
-			HorizontalFacing horizontal_facing() const { return get<0>(); }
+			HorizontalFacing horizontal_facing() const { return std::get<0>(tuple_); }
+
+			SpriteTuple tuple_;
 		};
 
 		void initializeSprites(Graphics& graphics);
@@ -46,9 +50,9 @@ struct FirstCaveBat : public Damageable {
 		units::Game x_, y_;
 		HorizontalFacing facing_;
 		units::Degrees flight_angle_;
-		std::map<SpriteState, boost::shared_ptr<Sprite> > sprites_;
+		std::map<FirstCaveBat::SpriteState, std::shared_ptr<Sprite> > sprites_;
 		Timer damage_timer_;
-		boost::shared_ptr<FloatingNumber> damage_text_;
+		std::shared_ptr<FloatingNumber> damage_text_;
 };
 
 #endif // FIRST_CAVE_BAT_H_

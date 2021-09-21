@@ -14,7 +14,7 @@ struct FixedBackdrop : public Backdrop {
 	void draw(Graphics& graphics) const;
 
 	private:
-		Graphics::SurfaceID surface_id_;
+		Graphics::TextureID texture_id_;
 };
 
 #endif // BACKDROP_H_

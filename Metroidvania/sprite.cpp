@@ -16,8 +16,8 @@ Sprite::Sprite(Graphics& graphics,
 
 // Method used to draw a sprite
 void Sprite::draw(Graphics& graphics, units::Game x, units::Game y) {
-	SDL_Rect destination_rectangle;
-	destination_rectangle.x = units::gameToPixel(x);
-	destination_rectangle.y = units::gameToPixel(y);
-	graphics.blitSurface(sprite_sheet_, &source_rect_, &destination_rectangle);
+	graphics.renderTexture(sprite_sheet_, 
+      units::gameToPixel(x), 
+      units::gameToPixel(y), 
+      &source_rect_);
 }

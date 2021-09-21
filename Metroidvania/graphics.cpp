@@ -1,59 +1,115 @@
 #include "graphics.h"
 
-#include <SDL/SDL.h>
+#include <stdexcept>
+#include <SDL2/SDL_image.h>
 
 #include "game.h"
 
 namespace {
-const int kBitsPerPixel = 32;
+	const int kBitsPerPixel = 32;
 }
 
 Graphics::Graphics() {
-	screen_ = SDL_SetVideoMode(
+	sdl_window_ = SDL_CreateWindow(
+		"Metroidvania",
+		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		units::tileToPixel(Game::kScreenWidth),
 		units::tileToPixel(Game::kScreenHeight),
-		kBitsPerPixel,
-		0);
-	SDL_ShowCursor(SDL_DISABLE);
+		SDL_WINDOW_OPENGL);
+
+	sdl_renderer_ = SDL_CreateRenderer(
+		sdl_window_,
+		-1,
+		SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+
+	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+	SDL_RenderSetLogicalSize(sdl_renderer_,
+		units::tileToPixel(Game::kScreenWidth),
+		units::tileToPixel(Game::kScreenHeight));
+
+	if (sdl_window_ == nullptr)
+		throw std::runtime_error("SDL_CreateWindow");
+	if (sdl_renderer_ == nullptr)
+		throw std::runtime_error("SDL_CreateRenderer");
+
+	//SDL_ShowCursor(SDL_DISABLE);
+
+	//camera_ = std::shared_ptr<Camera>(new Camera());
+	fullscreen_ = false;
 }
 
 Graphics::~Graphics() {
 	for (SpriteMap::iterator iter = sprite_sheets_.begin();
 		iter != sprite_sheets_.end();
 		++iter) {
-			SDL_FreeSurface(iter->second);
+		SDL_DestroyTexture(iter->second);
 	}
-	SDL_FreeSurface(screen_);
+	SDL_DestroyRenderer(sdl_renderer_);
+	SDL_DestroyWindow(sdl_window_);
 }
 
-Graphics::SurfaceID Graphics::loadImage(const std::string& file_name, bool black_is_transparent) {
-	const std::string file_path = config::getGraphicsQuality() == config::ORIGINAL_QUALITY ?
-		("../content/original_graphics/" + file_name + ".pbm") :
-		("../content/" + file_name + ".bmp");
+SDL_Texture* Graphics::loadImage(const std::string& file_name, bool black_is_transparent) {
+	const std::string file_path = "../content/" + file_name + ".bmp";
 
-	// if we haven't loaded the sprite sheet.
+	// Sprite cache, so we're not loading the same images over and over again.
 	if (sprite_sheets_.count(file_path) == 0) {
-		//load it
-		sprite_sheets_[file_path] = SDL_LoadBMP(file_path.c_str());
+		SDL_Texture* texture;
 		if (black_is_transparent) {
-			const Uint32 black_color = SDL_MapRGB(sprite_sheets_[file_path]->format, 0, 0, 0);
-			SDL_SetColorKey(sprite_sheets_[file_path], SDL_SRCCOLORKEY, black_color);
+			SDL_Surface* surface = SDL_LoadBMP(file_path.c_str());
+			if (surface == nullptr) {
+				std::string error = "Cannot load texture '" + file_path + "'!";
+				throw std::runtime_error(error);
+			}
+			const Uint32 black_color = SDL_MapRGB(surface->format, 0, 0, 0);
+			SDL_SetColorKey(surface, SDL_TRUE, black_color);
+			texture = SDL_CreateTextureFromSurface(sdl_renderer_, surface);
+			SDL_FreeSurface(surface);
 		}
+		else {
+			texture = IMG_LoadTexture(sdl_renderer_, file_path.c_str());
+		}
+		if (texture == nullptr) {
+			throw std::runtime_error("Cannot load texture!");
+		}
+		sprite_sheets_[file_path] = texture;
 	}
 	return sprite_sheets_[file_path];
 }
 
-void Graphics::blitSurface(
-		SurfaceID source,
-		SDL_Rect* source_rectangle,
-		SDL_Rect* destination_rectangle) {
-	SDL_BlitSurface(source, source_rectangle, screen_, destination_rectangle);
+void Graphics::renderTexture(SDL_Texture* texture,
+	const SDL_Rect destination,
+	const SDL_Rect* clip) const {
+	SDL_RenderCopy(sdl_renderer_, texture, clip, &destination);
+}
+
+void Graphics::renderTexture(SDL_Texture* texture,
+		int x, int y,
+		const SDL_Rect* clip) const {
+	SDL_Rect destination;
+	destination.x = x; // -camera_->camera.x;
+	destination.y = y; // - camera_->camera.y;
+	if (clip != nullptr) {
+		destination.w = clip->w;
+		destination.h = clip->h;
+	}
+	else {
+		SDL_QueryTexture(texture, nullptr, nullptr, &destination.w, &destination.h);
+	}
+	renderTexture(texture, destination, clip);
 }
 
 void Graphics::clear() {
-	SDL_FillRect(screen_, NULL /*destination_rectangle*/, 0 /*color*/);
+	SDL_RenderClear(sdl_renderer_);
 }
 
-void Graphics::flip() {
-	SDL_Flip(screen_);
+void Graphics::flip() const {
+	SDL_RenderPresent(sdl_renderer_);
+}
+
+void Graphics::toggleFullscreen() {
+	Uint32 flags = (SDL_GetWindowFlags(sdl_window_) ^ SDL_WINDOW_FULLSCREEN_DESKTOP);
+	int error = SDL_SetWindowFullscreen(sdl_window_, flags);
+	if (error < 0) {
+		throw std::runtime_error("Cannot make window fullscreen!");
+	}
 }

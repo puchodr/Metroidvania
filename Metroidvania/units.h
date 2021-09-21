@@ -48,7 +48,7 @@ namespace units {
 	}
 
 	inline Pixel gameToPixel(Game game) {
-		return config::getGraphicsQuality() == config::HIGH_QUALITY ?
+		return config::getGraphicsQuality() == config::GraphicsQuality::HIGH_QUALITY ?
 			Pixel(round(game)) :
 			Pixel(round(game) / 2);
 	}

@@ -18,7 +18,7 @@ FirstCaveBat::FirstCaveBat(Graphics& graphics, units::Game x, units::Game y) :
 	alive_(true),
 	x_(x),
 	y_(y),
-	facing_(RIGHT),
+	facing_(HorizontalFacing::RIGHT),
 	flight_angle_(0.0f),
 	damage_timer_(0),
 	damage_text_(new FloatingNumber(FloatingNumber::DAMAGE))
@@ -34,8 +34,8 @@ bool FirstCaveBat::update(units::MS elapsed_time, units::Game player_x) {
 	flight_angle_ += kAngularVelocity * elapsed_time;
 
 	facing_ = x_ + units::kHalfTile > player_x ? 
-		LEFT : 
-		RIGHT;
+		HorizontalFacing::LEFT : 
+		HorizontalFacing::RIGHT;
 
 	y_ = flight_center_y_ + kFlightAmplitude * units::Game(std::sin(units::degreesToRaidians(flight_angle_)));
 
@@ -50,13 +50,13 @@ units::HP FirstCaveBat::contactDamage() const {
 
 void FirstCaveBat::initializeSprites(Graphics& graphics) {
 	ENUM_FOREACH(h_facing, HORIZONTAL_FACING) {
-		initializeSprite(graphics, boost::make_tuple(HorizontalFacing(h_facing)));
+		initializeSprite(graphics, SpriteState(std::make_tuple(HorizontalFacing(h_facing))));
 	}
 }
 
 void FirstCaveBat::initializeSprite(Graphics& graphics, const SpriteState& sprite_state) {
-	units::Tile tile_y = sprite_state.horizontal_facing() == RIGHT ? 3 : 2;
-	sprites_[sprite_state] = boost::shared_ptr<Sprite>(new AnimatedSprite(
+	units::Tile tile_y = sprite_state.horizontal_facing() == HorizontalFacing::RIGHT ? 3 : 2;
+	sprites_[sprite_state] = std::shared_ptr<Sprite>(new AnimatedSprite(
 		graphics, "NpcCemet",
 		units::tileToPixel(2), units::tileToPixel(tile_y),
 		units::tileToPixel(1), units::tileToPixel(1),
@@ -64,5 +64,5 @@ void FirstCaveBat::initializeSprite(Graphics& graphics, const SpriteState& sprit
 }
 
 FirstCaveBat::SpriteState FirstCaveBat::getSpriteState() const {
-	return boost::make_tuple(facing_);
+	return SpriteState(std::make_tuple(facing_));
 }

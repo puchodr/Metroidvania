@@ -1,7 +1,7 @@
 #ifndef COLLISION_TILE_H_
 #define COLLISION_TILE_H_
 
-#include <boost/optional.hpp>
+#include <optional>
 
 #include "side_type.h"
 #include "tile_type.h"
@@ -20,7 +20,7 @@ struct CollisionTile {
 	// perpendicular_position: the position on the tile on the opposite axis of side
 	// leading_position: position of the leading edge of the colliding entity
 	// should_test_slopes: determines if slopes should be considered for collision.
-	boost::optional<units::Game> testCollision(
+	std::optional<units::Game> testCollision(
 			sides::SideType side,
 			units::Game perpendicular_position,
 			units::Game leading_position,

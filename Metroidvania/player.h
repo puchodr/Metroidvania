@@ -50,9 +50,9 @@ struct Player : public Damageable,
 	units::Game center_x() const { return kinematics_x_.position + units::kHalfTile; }
 	units::Game center_y() const { return kinematics_y_.position + units::kHalfTile; }
 
-	boost::shared_ptr<FloatingNumber> get_damage_text() { return damage_text_; }
+	std::shared_ptr<FloatingNumber> get_damage_text() { return damage_text_; }
 
-	std::vector<boost::shared_ptr<Projectile> > getProjectiles()
+	std::vector<std::shared_ptr<Projectile> > getProjectiles()
 		{ return polar_star_.getProjectiles(); }
 
 	private:
@@ -73,14 +73,18 @@ struct Player : public Damageable,
 			LAST_STRIDE_TYPE,
 		};
 
-		typedef boost::tuple<MotionType, HorizontalFacing, VerticalFacing, StrideType> SpriteTuple;
-		struct SpriteState : public SpriteTuple {
-			SpriteState(SpriteTuple& tuple) : SpriteTuple(tuple) {}
+		typedef std::tuple<MotionType, HorizontalFacing, VerticalFacing, StrideType> SpriteTuple;
+		struct SpriteState {
+			SpriteState(SpriteTuple& tuple) : tuple_(tuple) {}
+			SpriteState(const SpriteState& ss) : tuple_(ss.tuple_) {}
+			bool operator<(const SpriteState& ss) const { return tuple_ < ss.tuple_; }
 
-			MotionType motion_type() const { return get<0>(); }
-			HorizontalFacing horizontal_facing() const { return get<1>(); }
-			VerticalFacing vertical_facing() const { return get<2>(); }
-			StrideType stride_type() const { return get<3>(); }
+			MotionType motion_type() const { return std::get<0>(tuple_); }
+			HorizontalFacing horizontal_facing() const { return std::get<1>(tuple_); }
+			VerticalFacing vertical_facing() const { return std::get<2>(tuple_); }
+			StrideType stride_type() const { return std::get<3>(tuple_); }
+
+			SpriteTuple tuple_;
 		};
 
 		struct WalkingAnimation {
@@ -135,10 +139,10 @@ struct Player : public Damageable,
 		MotionType motionType() const;
 		bool on_ground() const { return on_ground_; }
 		const bool gun_up() const 
-			{ return motionType() == WALKING && walking_animation_.stride() != STRIDE_MIDDLE; }
+			{ return motionType() == MotionType::WALKING && walking_animation_.stride() != StrideType::STRIDE_MIDDLE; }
 		VerticalFacing vertical_facing() const { 
-			return on_ground() && intended_vertical_facing == DOWN ? 
-			HORIZONTAL : intended_vertical_facing; }
+			return on_ground() && intended_vertical_facing == VerticalFacing::DOWN ? 
+			VerticalFacing::HORIZONTAL : intended_vertical_facing; }
 
 		ParticleTools& particle_tools_;
 		Kinematics kinematics_x_, kinematics_y_;
@@ -151,7 +155,7 @@ struct Player : public Damageable,
 		
 		Health health_;
 		Timer invincible_timer_;
-		boost::shared_ptr<FloatingNumber> damage_text_;
+		std::shared_ptr<FloatingNumber> damage_text_;
 		FloatingNumber experience_text;
 
 		WalkingAnimation walking_animation_;
@@ -159,7 +163,7 @@ struct Player : public Damageable,
 		GunExperienceHud gun_experience_hud_;
 		PolarStar polar_star_;
 
-		std::map<SpriteState, boost::shared_ptr<Sprite> > sprites_;
+		std::map<SpriteState, std::shared_ptr<Sprite> > sprites_;
 };
 
 #endif // PLAYER_H

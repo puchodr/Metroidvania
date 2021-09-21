@@ -4,29 +4,38 @@
 #include <string>
 #include <map>
 
+#include <SDL2/SDL.h>
+
 struct SDL_Surface;
 struct SDL_Rect;
 
 struct Graphics {
-	typedef SDL_Surface* SurfaceID;
+	typedef SDL_Texture* TextureID;
 
 	Graphics();
 	~Graphics();
 
-	SurfaceID loadImage(const std::string& file_name, bool black_is_transparent=false);
+	SDL_Texture* loadImage(const std::string& file_name, bool black_is_transparent=false);
 
-	void blitSurface(
-		SurfaceID source,
-		SDL_Rect* source_rectangle,
-		SDL_Rect* destination_rectangle);
+   void renderTexture(SDL_Texture *texture, 
+         const SDL_Rect destination,
+         const SDL_Rect *clip=nullptr) const;
+	void renderTexture(SDL_Texture *texture, 
+         int x, int y, 
+         const SDL_Rect *clip=nullptr) const;
 
 	void clear();
-	void flip();
+	void flip() const;
+	void toggleFullscreen();
+
+   //std::shared_ptr<Camera> camera_;
 
 	private:
-		typedef std::map<std::string, SDL_Surface*> SpriteMap;
+		typedef std::map<std::string, SDL_Texture*> SpriteMap;
 		SpriteMap sprite_sheets_;
-		SDL_Surface* screen_;
+		SDL_Window* sdl_window_;
+		SDL_Renderer* sdl_renderer_;
+		bool fullscreen_;
 };
 
 #endif // GRAPHICS_H_

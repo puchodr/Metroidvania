@@ -5,7 +5,7 @@
 #include "collision_rectangle.h"
 #include "map.h"
 
-using boost::optional;
+using std::optional;
 
 namespace {
 	optional<units::Game> testMapCollision(
@@ -26,7 +26,7 @@ namespace {
 				return maybe_position;
 			}
 		}
-		return boost::none;
+		return {};
 	}
 }
 
@@ -70,8 +70,8 @@ void MapCollidable::update(const CollisionRectangle& collision_rectangle,
 	const units::Game delta = kinematics.velocity * elapsed_time_ms;
 	// Check collision in the direction of delta.
 	const sides::SideType direction = axis == X_AXIS ?
-		(delta > 0 ? sides::RIGHT_SIDE : sides::LEFT_SIDE) :
-		(delta > 0 ? sides::BOTTOM_SIDE : sides::TOP_SIDE);
+		(delta > 0 ? sides::SideType::RIGHT_SIDE : sides::SideType::LEFT_SIDE) :
+		(delta > 0 ? sides::SideType::BOTTOM_SIDE : sides::SideType::TOP_SIDE);
 
 	{ 
 		optional<units::Game> maybe_position = testMapCollision(

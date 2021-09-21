@@ -1,6 +1,6 @@
 #include "backdrop.h"
 
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 #include "game.h"
 
@@ -9,7 +9,7 @@ namespace {
 }
 
 FixedBackdrop::FixedBackdrop(const std::string& path, Graphics& graphics) {
-	surface_id_ = graphics.loadImage(path);
+	texture_id_ = graphics.loadImage(path);
 }
 
 void FixedBackdrop::draw(Graphics& graphics) const {
@@ -18,7 +18,9 @@ void FixedBackdrop::draw(Graphics& graphics) const {
 			SDL_Rect destination_rectangle;
 			destination_rectangle.x = units::tileToPixel(x);
 			destination_rectangle.y = units::tileToPixel(y);
-			graphics.blitSurface(surface_id_, NULL, &destination_rectangle);
+			graphics.renderTexture(texture_id_,
+				units::gameToPixel(x),
+				units::gameToPixel(y));
 		}
 	}
 }

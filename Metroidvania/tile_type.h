@@ -24,11 +24,11 @@ namespace tiles {
 	typedef std::bitset<LAST_TILE_FLAG> TileType;
 
 	inline TileFlag slope_flag_from_side(sides::SideType side) {
-		if (side == sides::LEFT_SIDE)
+		if (side == sides::SideType::LEFT_SIDE)
 			return LEFT_SLOPE;
-		if (side == sides::RIGHT_SIDE)
+		if (side == sides::SideType::RIGHT_SIDE)
 			return RIGHT_SLOPE;
-		if (side == sides::TOP_SIDE)
+		if (side == sides::SideType::TOP_SIDE)
 			return TOP_SLOPE;
 		return BOTTOM_SLOPE;
 	}
